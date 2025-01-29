@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.square0{
+
+  background-color: rgba(122, 195, 63, 0.838);
+  position: relative;
+}
+.square1{
+  background-color: rgb(233, 233, 229);
+  position: relative;
+}
+
