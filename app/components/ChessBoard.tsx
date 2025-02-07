@@ -14,6 +14,7 @@ import WhiteQueen from '../assets/Chess_qlt60.png';
 import BlackQueen from '../assets/Chess_qdt60.png';
 import WhiteKing from '../assets/Chess_klt60.png';
 import BlackKing from '../assets/Chess_kdt60.png';
+import next from "next";
 
 const initialBoard = [
     // Row 8
@@ -96,10 +97,19 @@ const BishopDirections = [
 
 
 
+
 function ChessBoard() {
     const [isBoard, setBoard] = useState(initialBoard); //render the board
     const [selectedPiece, setSelectedPiece] = useState(null); // track the selected piece
- 
+
+    const update = ():void => { 
+        
+
+
+    }
+
+    
+
     const handleClick = (index: any) => {
         if (selectedPiece === null) { // checking if no piece has been selected yet
             if (isBoard[index].piece) { //checks if this square contains a piece
@@ -128,21 +138,51 @@ function ChessBoard() {
                         updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; // Add the piece to the new square
                         setBoard(updatedArray); // Update the board
                         setSelectedPiece(null); // Reset the selection
+
                     }
-                    else if (targetRow === selectedRow + 1 && targetCol === selectedCol) { //move 2
+                    else if ((targetRow === selectedRow + 1 && targetCol === selectedCol) && !isBoard[index].piece ) 
+                        { //move 2
                         updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null }; // Remove the piece from the selected square
                         updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; // Add the piece to the new square
                         setBoard(updatedArray); // Update the board
                         setSelectedPiece(null); // Reset the selection
                     }
+                    else if ((targetRow === selectedRow + 1) && (targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1) || targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) {
+                        if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
+                            {
+                                updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null }; // Remove the piece from the selected square
+                                updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; // Add the piece to the new square
+                                setBoard(updatedArray); // Update the board
+                                setSelectedPiece(null); // Reset the selection
+                            }
+                        }
+                    }
+                
                 }
-                else if (targetRow === selectedRow + 1 && targetCol === selectedCol) { //not in first row and only move one
+                else if ((targetRow === selectedRow + 1) && (targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1) || targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) {
+                    if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
+                        {
+                            updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null }; // Remove the piece from the selected square
+                            updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; // Add the piece to the new square
+                            setBoard(updatedArray); // Update the board
+                            setSelectedPiece(null); // Reset the selection
+                        }
+                    }
+                }
+                else if ((targetRow === selectedRow + 1 && targetCol === selectedCol) && !isBoard[index].piece ) 
+                    { //move 2
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null }; // Remove the piece from the selected square
                     updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; // Add the piece to the new square
                     setBoard(updatedArray); // Update the board
                     setSelectedPiece(null); // Reset the selection
+
                 }
+                else{
+                    setSelectedPiece(null);
+                }
+               
             }
+
             if (isBoard[selectedPiece].piece?.type === "BlackPawn") {
                 if (selectedRow === 7) { // First row for Black
                     if (targetRow === selectedRow - 2 && targetCol === selectedCol) { // Move 2 squares
@@ -198,7 +238,7 @@ function ChessBoard() {
                 }
 
             }
-          
+
             if (isBoard[selectedPiece].piece?.type === "WhiteRook" || isBoard[selectedPiece].piece?.type === "BlackRook") {
                 if ((targetRow === selectedRow) || (targetCol === selectedCol)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
@@ -207,7 +247,7 @@ function ChessBoard() {
                     setSelectedPiece(null);
                 }
             }
-          
+
             //(targetRow === selectedRow - 1 && targetCol ===  String.fromCharCode(selectedCol.charCodeAt(0) -2 )) || (targetRow === selectedRow -1 && targetCol ===  String.fromCharCode(selectedCol.charCodeAt(0) +2 ))) { //1 row up  and 2 cols left or right
 
             if (isBoard[selectedPiece].piece?.type === "WhiteBishop" || isBoard[selectedPiece].piece?.type === "BlackBishop") {
@@ -235,111 +275,111 @@ function ChessBoard() {
 
 
             if (isBoard[selectedPiece].piece?.type === "WhiteKing" || isBoard[selectedPiece].piece?.type === "BlackKing") {
-                if ((targetRow === selectedRow +1) && (targetCol === selectedCol ))  { 
+                if ((targetRow === selectedRow + 1) && (targetCol === selectedCol)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-                else if ((targetRow === selectedRow -1)  &&  targetCol === selectedCol ) { 
+                else if ((targetRow === selectedRow - 1) && targetCol === selectedCol) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-               else if ((targetRow === selectedRow )  &&  targetCol === String.fromCharCode(selectedCol.charCodeAt(0) -1))  { 
+                else if ((targetRow === selectedRow) && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-                else if ((targetRow === selectedRow )  &&  targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))  { 
+                else if ((targetRow === selectedRow) && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-                else if ((targetRow === selectedRow -1)  &&  targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) { 
+                else if ((targetRow === selectedRow - 1) && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-                else if ((targetRow === selectedRow +1)  &&  targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1)) { 
+                else if ((targetRow === selectedRow + 1) && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-                else if ((targetRow === selectedRow +1)  &&  targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) { 
+                else if ((targetRow === selectedRow + 1) && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-                else if ((targetRow === selectedRow -1)  &&  targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1)) { 
+                else if ((targetRow === selectedRow - 1) && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-            
+
             }
 
             if (isBoard[selectedPiece].piece?.type === "WhiteQueen" || isBoard[selectedPiece].piece?.type === "BlackQueen") {
-                if ((targetRow === selectedRow) || (targetCol === selectedCol ))  { 
+                if ((targetRow === selectedRow) || (targetCol === selectedCol)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-                if ((targetRow === selectedRow +1) && (targetCol === selectedCol ))  { 
+                if ((targetRow === selectedRow + 1) && (targetCol === selectedCol)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-                else if ((targetRow === selectedRow -1)  &&  targetCol === selectedCol ) { 
+                else if ((targetRow === selectedRow - 1) && targetCol === selectedCol) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-               else if ((targetRow === selectedRow )  &&  targetCol === String.fromCharCode(selectedCol.charCodeAt(0) -1))  { 
+                else if ((targetRow === selectedRow) && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-                else if ((targetRow === selectedRow )  &&  targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))  { 
+                else if ((targetRow === selectedRow) && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-                else if ((targetRow === selectedRow -1)  &&  targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) { 
+                else if ((targetRow === selectedRow - 1) && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-                else if ((targetRow === selectedRow +1)  &&  targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1)) { 
+                else if ((targetRow === selectedRow + 1) && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-                else if ((targetRow === selectedRow +1)  &&  targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) { 
+                else if ((targetRow === selectedRow + 1) && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
-                else if ((targetRow === selectedRow -1)  &&  targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1)) { 
+                else if ((targetRow === selectedRow - 1) && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1)) {
                     updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
-                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; 
-                    setBoard(updatedArray); 
-                    setSelectedPiece(null); 
+                    updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+                    setBoard(updatedArray);
+                    setSelectedPiece(null);
                 }
 
                 for (const { row: rowDir, col: colDir } of BishopDirections) {
@@ -363,10 +403,10 @@ function ChessBoard() {
 
 
 
-        //    console.log("selectedRow "+ selectedRow)
-        //     console.log("targetRow "+ targetRow)
-        //     console.log("targetCol "+ targetCol)
-        //     console.log("selectedCol "+ selectedCol)
+            //    console.log("selectedRow "+ selectedRow)
+            //     console.log("targetRow "+ targetRow)
+            //     console.log("targetCol "+ targetCol)
+            //     console.log("selectedCol "+ selectedCol)
         }
     };
     return (
