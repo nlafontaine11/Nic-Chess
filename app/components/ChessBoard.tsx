@@ -1,6 +1,8 @@
 'use client'
 import { useState } from "react";
 import Image from 'next/image';
+import Popup from 'reactjs-popup';
+import { Board, isCheckmate, isKingInCheck, getValidMoves, getPawnMoves, Square, simulateMove } from './checkMate';
 
 import WhitePawn from '../assets/Chess_plt60.png';
 import BlackPawn from '../assets/Chess_pdt60.png';
@@ -101,7 +103,44 @@ const BishopDirections = [
 function ChessBoard() {
     const [isBoard, setBoard] = useState(initialBoard); //render the board
     const [selectedPiece, setSelectedPiece] = useState(null); // track the selected piece
+    const [currentPlayer, setCurrentPlayer] = useState("White");
 
+
+    const checkGameState = (color: 'White' | 'Black') => {
+        
+        const fromSquare: Square = { row: 2, col: 'B'};
+const toSquare: Square = { row: 3, col: 'A' };
+        const newBoard = simulateMove(isBoard, fromSquare, toSquare);
+        console.log(newBoard);
+
+
+        if (isCheckmate(isBoard, color)) {
+            console.log(`${color} is in checkmate!`);
+        } else if (isKingInCheck(isBoard, color)) {
+            console.log(`${color} is in check!`);
+        } else {
+            console.log(`${color} is safe.`);
+
+        }
+    };
+
+
+
+    const reset = () => {
+        setBoard(initialBoard);
+        setCurrentPlayer("White");
+    }
+    const switchTurn = () => {
+        setCurrentPlayer((prevPlayer) => (prevPlayer === "White" ? "Black" : "White"));
+        /* notes
+        1. prevPlayers (or prevState) is a mechanism to access the state of a component before its latest update, ensuring reliable and consistent state transitions especially in scenarios where the new state depends on the old state. It's not something passed down as props or anything, it's a built-in functionality provided by React and the useState hook.
+            
+        2. prevPlayer === White ? Black : white
+        so prevPlayer = white its true and returns white
+        if false then checks black for T/F 
+        if false again on black then deflaut to white
+        */
+    }
     const update = (index: any): void => {
         if (selectedPiece === null) { // checking if no piece has been selected yet
             if (isBoard[index].piece) { //checks if this square contains a piece
@@ -114,23 +153,127 @@ function ChessBoard() {
             updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; // Add the piece to the new square
             setBoard(updatedArray); // Update the board
             setSelectedPiece(null); // Reset the selection
+            const opponentColor = currentPlayer === "White" ? "Black" : "White";
+            checkGameState(opponentColor);
+            switchTurn();
         }
 
+
+    }
+    const checkForJump = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any): boolean => {
+        //checking if you can jump over other peice
+        let flag = true;
+        if (selectedRow < targetRow) { //up
+            for (let i = selectedRow + 1; i < targetRow; i++) { //up
+                let checkIndex = (8 - i) * 8 + (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0));
+                if (isBoard[checkIndex].piece) {
+                    console.log("here");
+                    flag = false;
+                }
+            }
+        }
+        if (selectedRow > targetRow) {//down
+            for (let i = selectedRow - 1; i > targetRow; i--) {//down
+                let checkIndex = (8 - i) * 8 + (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0));
+                if (isBoard[checkIndex].piece) {
+                    console.log("here2");
+                    flag = false;
+                }
+            }
+        }
+        if (((selectedCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)) + 1) < (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0))) {
+            for (let i = (selectedCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)) + 1; i <= (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)); i++) {//right
+                let checkIndex = (8 - targetRow) * 8 + i;
+                if (isBoard[checkIndex].piece) {
+                    console.log("here3");
+                    flag = false;
+                }
+            }
+        }
+        if (((selectedCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)) - 1) > (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0))) {
+            for (let i = (selectedCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)) - 1; i > (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)); i--) {//left
+                let checkIndex = (8 - targetRow) * 8 + i;
+                if (isBoard[checkIndex].piece) {
+                    console.log("here4");
+                    flag = false;
+                }
+            }
+        }
+
+
+        if (flag === true) {
+            return flag;
+        } else {
+            return flag;
+        }
+
+    }
+    const checkForJumpBishops = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any): boolean => {
+        let flag = true;
+
+        if ((selectedRow + ((selectedCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)))) < targetRow + (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0))) { //up right
+            for (let i = selectedRow + 1, j = ((selectedCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)) + 1); i < targetRow; i++, j++) {
+                let checkIndex = (8 - i) * 8 + j;
+                if (isBoard[checkIndex].piece) {
+                    flag = false;
+                }
+
+            }
+        }
+        if ((selectedRow + ((selectedCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)))) > targetRow + (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0))) { //down right
+            for (let i = targetRow + 1, j = (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)) + 1; i < selectedRow; i++, j++) {
+                let checkIndex = (8 - i) * 8 + j;
+                if (isBoard[checkIndex].piece) {
+                    flag = false;
+                }
+
+            }
+        }
+
+
+        if ((selectedRow + ((selectedCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)))) === targetRow + (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0))) { //up left
+            for (let i = selectedRow + 1, j = (selectedCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)) - 1; i < targetRow; i++, j--) {
+                let checkIndex = (8 - i) * 8 + j;
+                if (isBoard[checkIndex].piece) {
+                    flag = false;
+                }
+
+            }
+            for (let i = targetRow + 1, j = (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)) - 1; i < selectedRow; i++, j--) {       //down left
+                let checkIndex = (8 - i) * 8 + j;
+                if (isBoard[checkIndex].piece) {
+                    flag = false;
+                }
+
+            }
+
+        }
+        if (flag === true) {
+            return flag;
+        } else {
+            return flag;
+        }
 
     }
     const WhitePawn = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
         if (selectedRow === 2) { //first row
             if ((targetRow === selectedRow + 2 && targetCol === selectedCol) && !isBoard[index].piece) { //move 2
-                update(index);
+                if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                    update(index);
+                }
 
             }
             else if ((targetRow === selectedRow + 1 && targetCol === selectedCol) && !isBoard[index].piece) { //move 2
-                update(index);
+                if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                    update(index);
+                }
             }
             else if ((targetRow === selectedRow + 1) && (targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1) || targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) {
                 if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
                     {
-                        update(index);
+                        if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                            update(index);
+                        }
                     }
                 }
             }
@@ -138,40 +281,53 @@ function ChessBoard() {
         else if ((targetRow === selectedRow + 1) && (targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1) || targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) {
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
                 {
-                    update(index);
+                    if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                        update(index);
+                    }
                 }
             }
         }
         else if ((targetRow === selectedRow + 1 && targetCol === selectedCol) && !isBoard[index].piece) { //move 2
-            update(index);
-
+            if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                update(index);
+            }
         }
 
     }
     const BlackPawn = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
         if (selectedRow === 7) { // First row for Black
             if ((targetRow === selectedRow - 2 && targetCol === selectedCol) && !isBoard[index].piece) { // Move 2 squares
-                update(index);
+                if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                    update(index);
+                }
             }
             else if ((targetRow === selectedRow - 1 && targetCol === selectedCol) && !isBoard[index].piece) { // Move 1 square
-                update(index);
+                if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                    update(index);
+                }
             }
             else if ((targetRow === selectedRow - 1) && (targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1) || targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) {
                 if (isBoard[index].piece && isBoard[index].piece?.type.includes("White")) {
                     {
-                        update(index);
+                        if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                            update(index);
+                        }
                     }
                 }
             }
         } else if ((targetRow === selectedRow - 1) && (targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1) || targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) {
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("White")) {
                 {
-                    update(index);
+                    if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                        update(index);
+                    }
                 }
             }
         }
         else if ((targetRow === selectedRow - 1 && targetCol === selectedCol) && !isBoard[index].piece) { //move 2
-            update(index);
+            if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                update(index);
+            }
         }
 
     }
@@ -260,33 +416,38 @@ function ChessBoard() {
             update(index);
         }
     }
-
     const WhiteRook = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
         if (((targetRow === selectedRow) || (targetCol === selectedCol)) && !isBoard[index].piece) {
-            update(index);
+            if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                update(index);
+            }
         }
         else if (((targetRow === selectedRow) || (targetCol === selectedCol))) {
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
                 {
-                    update(index);
+                    if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                        update(index);
+                    }
                 }
             }
         }
     }
-
     const BlackRook = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
         if (((targetRow === selectedRow) || (targetCol === selectedCol)) && !isBoard[index].piece) {
-            update(index);
+            if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                update(index);
+            }
         }
         else if (((targetRow === selectedRow) || (targetCol === selectedCol))) {
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("White")) {
                 {
-                    update(index);
+                    if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                        update(index);
+                    }
                 }
             }
         }
     }
-
     const WhiteBishop = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
         for (const { row: rowDir, col: colDir } of BishopDirections) {
             let currentRow = selectedRow;
@@ -295,12 +456,16 @@ function ChessBoard() {
                 currentRow += rowDir;
                 currentCol = String.fromCharCode(currentCol.charCodeAt(0) + colDir);
                 if ((currentRow === targetRow && currentCol === targetCol) && !isBoard[index].piece) {
-                    update(index);
+                    if (checkForJumpBishops(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                        update(index);
+                    }
                     return;
                 }
                 else if ((currentRow === targetRow && currentCol === targetCol)) {
                     if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
-                        update(index);
+                        if (checkForJumpBishops(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                            update(index);
+                        }
                         return;
                     }
                 }
@@ -331,7 +496,6 @@ function ChessBoard() {
             }
         }
     }
-
     const WhiteKing = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
 
         if (((targetRow === selectedRow + 1) && (targetCol === selectedCol)) || ((targetRow === selectedRow - 1) && targetCol === selectedCol)) {
@@ -382,8 +546,6 @@ function ChessBoard() {
         }
 
     }
-
-
     const BlackKing = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
         if (((targetRow === selectedRow + 1) && (targetCol === selectedCol)) || ((targetRow === selectedRow - 1) && targetCol === selectedCol)) {
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("White")) {
@@ -432,31 +594,18 @@ function ChessBoard() {
             update(index);
         }
     }
-
     const WhiteQueen = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
         WhitePawn(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
         WhiteRook(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
         WhiteBishop(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
         WhiteKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
     }
-
     const BlackQueen = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
         BlackPawn(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
         BlackRook(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
         BlackBishop(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
         BlackKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
     const handleClick = (index: any) => {
@@ -475,76 +624,81 @@ function ChessBoard() {
             // console.log("targetCol "+ targetCol)
             // console.log("selectedCol "+ selectedCol)
 
+            if (currentPlayer === "White") {
+                if (isBoard[selectedPiece].piece?.type === "WhitePawn") {
+                    WhitePawn(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                } else {
+                    setSelectedPiece(null);
+                }
+                if (isBoard[selectedPiece].piece?.type === "WhiteKnight") {
+                    WhiteKnight(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                } else {
+                    setSelectedPiece(null);
+                }
+                if (isBoard[selectedPiece].piece?.type === "WhiteRook") {
+                    WhiteRook(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
 
-            if (isBoard[selectedPiece].piece?.type === "WhitePawn") {
-                WhitePawn(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-            } else {
-                setSelectedPiece(null);
-            }
+                } else {
+                    setSelectedPiece(null);
+                }
+                if (isBoard[selectedPiece].piece?.type === "WhiteBishop") {
+                    WhiteBishop(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
 
-            if (isBoard[selectedPiece].piece?.type === "BlackPawn") {
-                BlackPawn(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-            } else {
-                setSelectedPiece(null);
-            }
+                } else {
+                    setSelectedPiece(null);
+                }
+                if (isBoard[selectedPiece].piece?.type === "WhiteKing") {
+                    WhiteKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
 
-            if (isBoard[selectedPiece].piece?.type === "WhiteKnight") {
-                WhiteKnight(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-            } else {
-                setSelectedPiece(null);
-            }
+                } else {
+                    setSelectedPiece(null);
+                }
+                if (isBoard[selectedPiece].piece?.type === "WhiteQueen") {
+                    WhiteQueen(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
 
-            if (isBoard[selectedPiece].piece?.type === "BlackKnight") {
-                BlackKnight(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-            } else {
-                setSelectedPiece(null);
-            }
-            if (isBoard[selectedPiece].piece?.type === "WhiteRook") {
-                WhiteRook(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                } else {
+                    setSelectedPiece(null);
+                }
 
-            } else {
-                setSelectedPiece(null);
-            }
-            if (isBoard[selectedPiece].piece?.type === "BlackRook") {
-                BlackRook(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-            } else {
-                setSelectedPiece(null);
-            }
-            if (isBoard[selectedPiece].piece?.type === "WhiteBishop") {
-                WhiteBishop(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-
-            } else {
-                setSelectedPiece(null);
-            }
-            if (isBoard[selectedPiece].piece?.type === "BlackBishop") {
-                BlackBishop(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-            } else {
-                setSelectedPiece(null);
             }
 
-            if (isBoard[selectedPiece].piece?.type === "WhiteKing") {
-                WhiteKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+            if (currentPlayer === "Black") {
+                if (isBoard[selectedPiece].piece?.type === "BlackPawn") {
+                    BlackPawn(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                } else {
+                    setSelectedPiece(null);
+                }
 
-            } else {
-                setSelectedPiece(null);
-            }
-            if (isBoard[selectedPiece].piece?.type === "BlackKing") {
-                BlackKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-            } else {
-                setSelectedPiece(null);
-            }
-            if (isBoard[selectedPiece].piece?.type === "WhiteQueen") {
-                WhiteQueen(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                if (isBoard[selectedPiece].piece?.type === "BlackKnight") {
+                    BlackKnight(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                } else {
+                    setSelectedPiece(null);
+                }
 
-            } else {
-                setSelectedPiece(null);
-            }
-            if (isBoard[selectedPiece].piece?.type === "BlackQueen") {
-                BlackQueen(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-            } else {
-                setSelectedPiece(null);
-            }
+                if (isBoard[selectedPiece].piece?.type === "BlackRook") {
+                    BlackRook(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                } else {
+                    setSelectedPiece(null);
+                }
 
+                if (isBoard[selectedPiece].piece?.type === "BlackBishop") {
+                    BlackBishop(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                } else {
+                    setSelectedPiece(null);
+                }
+
+                if (isBoard[selectedPiece].piece?.type === "BlackKing") {
+                    BlackKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                } else {
+                    setSelectedPiece(null);
+                }
+
+                if (isBoard[selectedPiece].piece?.type === "BlackQueen") {
+                    BlackQueen(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                } else {
+                    setSelectedPiece(null);
+                }
+            }
 
 
 
@@ -552,28 +706,36 @@ function ChessBoard() {
     };
     return (
         <main className="flex items-center justify-center h-screen">
-            <div className="grid grid-cols-8 grid-rows-8 border-4 border-black h-96 w-96 ">
-                {isBoard.map((square, index) => ( //looping through the array
-                    <div
-                        className={`square${(index + Math.floor(index / 8)) % 2}`} //this is giving square0 or square1
-                        key={index} //  unique identifier for each element -helps when rerendering
-                        onClick={() => handleClick(index)}
-                    >
-                        {square.piece && (
-                            <Image
-                                src={square.piece.image}
-                                alt={square.piece.type}
-                                width={50}
-                                height={50}
+            <div>
+                <p>Current Turn: {currentPlayer}</p>
 
-                            />)}
+                <Popup trigger={<button> Reset</button>} position="right center">
+                    <button onClick={() => reset()} className="bg-red-500 border-2 border-black">Reset</button>
+                </Popup>
+                <div className="grid grid-cols-8 grid-rows-8 border-4 border-black h-96 w-96 ">
+                    {isBoard.map((square, index) => ( //looping through the array
+                        <div
+                            className={`square${(index + Math.floor(index / 8)) % 2}`} //this is giving square0 or square1
+                            key={index} //  unique identifier for each element -helps when rerendering
+                            onClick={() =>
+                                handleClick(index)
+                            }
+                        >
+                            {square.piece && (
+                                <Image
+                                    src={square.piece.image}
+                                    alt={square.piece.type}
+                                    width={50}
+                                    height={50}
 
-                        <span className="absolute top-1 left-1 text-xs text-black">
-                            {square.row}{square.col}
-                        </span>
-                    </div>
-                ))}
+                                />)}
 
+                            <span className="absolute top-1 left-1 text-xs text-black">
+                                {square.row}{square.col}
+                            </span>
+                        </div>
+                    ))}
+                </div>
 
             </div>
 
