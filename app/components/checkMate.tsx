@@ -1,4 +1,4 @@
-import { StaticImageData } from "next/image"; 
+import { StaticImageData } from "next/image";
 
 export type Piece = {
     type: string;
@@ -14,54 +14,77 @@ export type Square = {
 export type Board = Square[];
 
 
-// Find the king's position on the board
+//i like
 export const findKing = (board: Board, color: string) => {
-    if(color === 'Black'){
+    if (color === 'Black') {
         return board.find(square => square.piece?.type === 'BlackKing');
     }
-    else{
+    else {
         return board.find(square => square.piece?.type === 'WhiteKing');
     }
 };
 
-// Check if the king is in check
-export const isKingInCheck = (board: Board, color: string) => {
+// Fix the isKingInCheck function
+// Detailed debug version of isKingInCheck
+export const isKingInCheck = (board: Board, color: string): boolean => {
     const king = findKing(board, color);
     if (!king) {
         console.warn(`King for ${color} not found!`);
         return false;
     }
 
-    return board.some(square =>
-        square.piece &&
-        !square.piece.type.includes(color) && // Ensures it's an opponent's piece
-        getValidMoves(board, square).some(move => move.row === king.row && move.col === king.col)
-    );
-};
-// Convert a letter (a-h) to its corresponding index (0-7)
+
+    // Check each opponent piece
+    for (const square of board) {
+        if (square.piece && !square.piece.type.includes(color)) {
+
+
+            const validMoves = getValidMoves(board, square);
+
+            // Check if any valid move can capture the king
+            for (const move of validMoves) {
+
+                if (move.row === king.row &&
+                    move.col.toLowerCase() === king.col.toLowerCase()) {
+
+                    return true; // King is in check
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+// First, fix the letterToIndex function to handle both uppercase and lowercase
 const letterToIndex = (letter: string): number => {
-    return letter.charCodeAt(0) - 'a'.charCodeAt(0); // 'a' becomes 0, 'b' becomes 1, ..., 'h' becomes 7
+    return letter.toLowerCase().charCodeAt(0) - 'a'.charCodeAt(0);
 };
 
-// Convert an index (0-7) back to a letter (a-h)
-const indexToLetter = (index: number): string => {
-    return String.fromCharCode(index + 'a'.charCodeAt(0)); // 0 becomes 'a', 1 becomes 'b', ..., 7 becomes 'h'
-};
+// const indexToLetter = (index: number): string => {
+//     // Return uppercase to match your board representation
+//     return String.fromCharCode(index + 'A'.charCodeAt(0));
+// };
 
 // Simulate a move and return the new board state
 export const simulateMove = (board: Board, from: Square, to: Square): Board => {
-    // Convert columns to indices for easier comparison
-    const fromColIndex = letterToIndex(from.col);
-    const toColIndex = letterToIndex(to.col);
+    // Create a deep copy of the board to avoid any reference issues
+    const newBoard = board.map(square => ({
+        ...square,
+        piece: square.piece ? { ...square.piece } : undefined
+    }));
 
-    return board.map(square => {
-        if (square.row === from.row && square.col === from.col) {
-            return { ...square, piece: undefined }; // Clear the original piece
-        } else if (square.row === to.row && square.col === to.col) {
-            return { ...square, piece: from.piece }; // Place the piece in the new square
-        }
-        return square;
-    });
+    // Find the actual squares in the new board copy
+    const fromSquare = newBoard.find(s => s.row === from.row && s.col.toLowerCase() === from.col.toLowerCase());
+    const toSquare = newBoard.find(s => s.row === to.row && s.col.toLowerCase() === to.col.toLowerCase());
+
+    if (!fromSquare || !toSquare) return newBoard;
+
+    // Move the piece
+    toSquare.piece = fromSquare.piece;
+    fromSquare.piece = undefined;
+
+    return newBoard;
 };
 
 
@@ -69,7 +92,7 @@ export const simulateMove = (board: Board, from: Square, to: Square): Board => {
 export const getValidMoves = (board: Board, square: Square): Square[] => {
     if (!square.piece) return [];
     const { type } = square.piece;
-    
+
     // Extract color from type (assuming types are "WhitePawn", "BlackKnight", etc.)
     const color = type.includes("White") ? "White" : "Black";
     const pieceType = type.replace("White", "").replace("Black", ""); // Strip color
@@ -87,6 +110,9 @@ export const getValidMoves = (board: Board, square: Square): Square[] => {
         default: return [];
     }
 };
+
+
+
 
 export const getPawnMoves = (board: Board, square: Square, color: string): Square[] => {
     const moves: Square[] = [];
@@ -138,9 +164,31 @@ export const getBishopMoves = (board: Board, square: Square, color: string): Squ
 };
 
 
+// Fix the queen moves generation
 export const getQueenMoves = (board: Board, square: Square, color: string): Square[] => {
-    return [...getRookMoves(board, square, color), ...getBishopMoves(board, square, color)];
-};
+    // Queen combines rook and bishop movements
+    // Get all horizontal and vertical moves (rook-like)
+    const horizontalVerticalDirections = [
+        { row: 1, col: 0 },  // down
+        { row: -1, col: 0 }, // up
+        { row: 0, col: 1 },  // right
+        { row: 0, col: -1 }  // left
+    ];
+
+    // Get all diagonal moves (bishop-like)
+    const diagonalDirections = [
+        { row: 1, col: 1 },   // down-right
+        { row: 1, col: -1 },  // down-left
+        { row: -1, col: 1 },  // up-right
+        { row: -1, col: -1 }  // up-left
+    ];
+
+    // Combine both types of moves
+    const rookMoves = getSlidingMoves(board, square, color, horizontalVerticalDirections);
+    const bishopMoves = getSlidingMoves(board, square, color, diagonalDirections);
+
+    return [...rookMoves, ...bishopMoves];
+}
 
 // Generate valid moves for a knight
 export const getKnightMoves = (board: Board, square: Square, color: string): Square[] => {
@@ -177,14 +225,18 @@ export const getKingMoves = (board: Board, square: Square, color: string): Squar
 };
 
 
-// Generate valid moves for sliding pieces (rook, bishop, queen)
-const getSlidingMoves = (board: Board, square: Square, color: string, directions: { row: number, col: number }[], maxSteps = 8): Square[] => {
+// Ensure valid move generation is case-insensitive
+export const getSlidingMoves = (board: Board, square: Square, color: string, directions: { row: number, col: number }[], maxSteps = 8): Square[] => {
     const moves: Square[] = [];
     const colIndex = letterToIndex(square.col); // Convert column to index for comparison
 
     directions.forEach(({ row, col }) => {
         for (let i = 1; i <= maxSteps; i++) {
-            const move = board.find(sq => sq.row === square.row + i * row && letterToIndex(sq.col) === colIndex + i * col);
+            const move = board.find(sq =>
+                sq.row === square.row + i * row &&
+                letterToIndex(sq.col) === colIndex + i * col
+            );
+
             if (!move) break;
             if (move.piece) {
                 if (!move.piece.type.includes(color)) moves.push(move); // Capture opponent's piece
@@ -198,17 +250,55 @@ const getSlidingMoves = (board: Board, square: Square, color: string, directions
 };
 
 
-// Checkmate detection
-export const isCheckmate = (board: Board, color: string) => {
-    if (!isKingInCheck(board, color)) return false;
-
-    // Check if any move can escape check
-    return board
-        .filter(square => square.piece && square.piece.type.includes(color)) // Only current player's pieces
-        .every(square =>
-            getValidMoves(board, square).every(move => {
-                const simulatedBoard = simulateMove(board, square, move);
-                return isKingInCheck(simulatedBoard, color);
-            })
-        );
+// where I stopped last
+export const getValidMovesToSaveKing = (board: Board, color: string): { from: Square, to: Square }[] => {
+    const validSavingMoves: { from: Square, to: Square }[] = [];
+    
+    // Find all pieces of this color
+    const playerPieces = board.filter(square =>
+        square.piece && square.piece.type.includes(color)
+    );
+    
+    // Check each piece's moves
+    for (const piece of playerPieces) {
+        const validMoves = getValidMoves(board, piece);
+        
+        // Try each move
+        for (const move of validMoves) {
+            const simulatedBoard = simulateMove(board, piece, move);
+            const stillInCheck = isKingInCheck(simulatedBoard, color);
+            
+            if (stillInCheck) {
+                // This move saves the king
+                validSavingMoves.push({ from: piece, to: move });
+            }
+        }
+    }
+    
+    return validSavingMoves;
 };
+// More robust checkmate detection
+export const isCheckmate = (board: Board, color: string): boolean => {
+    // First check if king is in check
+    if (!isKingInCheck(board, color)) {
+        return false;
+    }
+    // Find all pieces of this color
+    const playerPieces = board.filter(square =>
+        square.piece && square.piece.type.includes(color)
+    );
+
+    // Check each piece's moves
+    for (const piece of playerPieces) {
+        const validMoves = getValidMoves(board, piece);
+        // Try each move
+        for (const move of validMoves) {
+            const simulatedBoard = simulateMove(board, piece, move);
+            const stillInCheck = isKingInCheck(simulatedBoard, color);
+            if (!stillInCheck) {
+                return false; // Found an escape move
+            }
+        }
+    }
+    return true; // No escape moves found
+}

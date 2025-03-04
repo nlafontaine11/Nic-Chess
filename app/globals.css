@@ -4,11 +4,16 @@
 
 .square0{
 
-  background-color: rgba(122, 195, 63, 0.838);
+  background-color: rgb(209, 207, 205);
   position: relative;
 }
-.square1{
-  background-color: rgb(233, 233, 229);
+.square1 {
+  background-color: rgb(166, 165, 164);
   position: relative;
 }
-
+.highlight {
+  outline: 3px solid rgba(249, 6, 6, 0.446);
+  outline-offset: 0;
+  position: relative;
+  z-index: 1;
+}

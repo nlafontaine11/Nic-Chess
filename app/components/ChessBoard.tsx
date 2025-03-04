@@ -1,42 +1,45 @@
 'use client'
 import { useState } from "react";
 import Image from 'next/image';
-import Popup from 'reactjs-popup';
-import { Board, isCheckmate, isKingInCheck, getValidMoves, getPawnMoves, Square, simulateMove } from './checkMate';
+import { findKing, getValidMoves, getValidMovesToSaveKing, isCheckmate, isKingInCheck, Square } from "./checkMate";
+import Popup from "reactjs-popup";
 
-import WhitePawn from '../assets/Chess_plt60.png';
-import BlackPawn from '../assets/Chess_pdt60.png';
-import WhiteRook from '../assets/Chess_rlt60.png';
-import BlackRook from '../assets/Chess_rdt60.png';
-import WhiteKnight from '../assets/Chess_nlt60.png';
-import BlackKnight from '../assets/Chess_ndt60.png';
-import WhiteBishop from '../assets/Chess_blt60.png';
-import BlackBishop from '../assets/Chess_bdt60.png';
-import WhiteQueen from '../assets/Chess_qlt60.png';
-import BlackQueen from '../assets/Chess_qdt60.png';
-import WhiteKing from '../assets/Chess_klt60.png';
-import BlackKing from '../assets/Chess_kdt60.png';
-import next from "next";
+import WhiteP from '../assets/Chess_plt60.png';
+import BlackP from '../assets/Chess_pdt60.png';
+import WhiteR from '../assets/Chess_rlt60.png';
+import BlackR from '../assets/Chess_rdt60.png';
+import WhiteKn from '../assets/Chess_nlt60.png';
+import BlackKn from '../assets/Chess_ndt60.png';
+import WhiteB from '../assets/Chess_blt60.png';
+import BlackB from '../assets/Chess_bdt60.png';
+import WhiteQ from '../assets/Chess_qlt60.png';
+import BlackQ from '../assets/Chess_qdt60.png';
+import WhiteK from '../assets/Chess_klt60.png';
+import BlackK from '../assets/Chess_kdt60.png';
+
+
+
+
 
 const initialBoard = [
     // Row 8
-    { piece: { type: 'BlackRook', image: BlackRook }, row: 8, col: 'A' },
-    { piece: { type: 'BlackKnight', image: BlackKnight }, row: 8, col: 'B' },
-    { piece: { type: 'BlackBishop', image: BlackBishop }, row: 8, col: 'C' },
-    { piece: { type: 'BlackQueen', image: BlackQueen }, row: 8, col: 'D' },
-    { piece: { type: 'BlackKing', image: BlackKing }, row: 8, col: 'E' },
-    { piece: { type: 'BlackBishop', image: BlackBishop }, row: 8, col: 'F' },
-    { piece: { type: 'BlackKnight', image: BlackKnight }, row: 8, col: 'G' },
-    { piece: { type: 'BlackRook', image: BlackRook }, row: 8, col: 'H' },
+    { piece: { type: 'BlackRook', image: BlackR }, row: 8, col: 'A' },
+    { piece: { type: 'BlackKnight', image: BlackKn }, row: 8, col: 'B' },
+    { piece: { type: 'BlackBishop', image: BlackB }, row: 8, col: 'C' },
+    { piece: { type: 'BlackQueen', image: BlackQ }, row: 8, col: 'D' },
+    { piece: { type: 'BlackKing', image: BlackK }, row: 8, col: 'E' },
+    { piece: { type: 'BlackBishop', image: BlackB }, row: 8, col: 'F' },
+    { piece: { type: 'BlackKnight', image: BlackKn }, row: 8, col: 'G' },
+    { piece: { type: 'BlackRook', image: BlackR }, row: 8, col: 'H' },
     // Row 7
-    { piece: { type: 'BlackPawn', image: BlackPawn }, row: 7, col: 'A' },
-    { piece: { type: 'BlackPawn', image: BlackPawn }, row: 7, col: 'B' },
-    { piece: { type: 'BlackPawn', image: BlackPawn }, row: 7, col: 'C' },
-    { piece: { type: 'BlackPawn', image: BlackPawn }, row: 7, col: 'D' },
-    { piece: { type: 'BlackPawn', image: BlackPawn }, row: 7, col: 'E' },
-    { piece: { type: 'BlackPawn', image: BlackPawn }, row: 7, col: 'F' },
-    { piece: { type: 'BlackPawn', image: BlackPawn }, row: 7, col: 'G' },
-    { piece: { type: 'BlackPawn', image: BlackPawn }, row: 7, col: 'H' },
+    { piece: { type: 'BlackPawn', image: BlackP }, row: 7, col: 'A' },
+    { piece: { type: 'BlackPawn', image: BlackP }, row: 7, col: 'B' },
+    { piece: { type: 'BlackPawn', image: BlackP }, row: 7, col: 'C' },
+    { piece: { type: 'BlackPawn', image: BlackP }, row: 7, col: 'D' },
+    { piece: { type: 'BlackPawn', image: BlackP }, row: 7, col: 'E' },
+    { piece: { type: 'BlackPawn', image: BlackP }, row: 7, col: 'F' },
+    { piece: { type: 'BlackPawn', image: BlackP }, row: 7, col: 'G' },
+    { piece: { type: 'BlackPawn', image: BlackP }, row: 7, col: 'H' },
     // Row 6
     ...'ABCDEFGH'.split('').map(col => ({ piece: null, row: 6, col })),
     // Row 5
@@ -46,23 +49,23 @@ const initialBoard = [
     // Row 3
     ...'ABCDEFGH'.split('').map(col => ({ piece: null, row: 3, col })),
     // Row 2
-    { piece: { type: 'WhitePawn', image: WhitePawn }, row: 2, col: 'A' },
-    { piece: { type: 'WhitePawn', image: WhitePawn }, row: 2, col: 'B' },
-    { piece: { type: 'WhitePawn', image: WhitePawn }, row: 2, col: 'C' },
-    { piece: { type: 'WhitePawn', image: WhitePawn }, row: 2, col: 'D' },
-    { piece: { type: 'WhitePawn', image: WhitePawn }, row: 2, col: 'E' },
-    { piece: { type: 'WhitePawn', image: WhitePawn }, row: 2, col: 'F' },
-    { piece: { type: 'WhitePawn', image: WhitePawn }, row: 2, col: 'G' },
-    { piece: { type: 'WhitePawn', image: WhitePawn }, row: 2, col: 'H' },
+    { piece: { type: 'WhitePawn', image: WhiteP }, row: 2, col: 'A' },
+    { piece: { type: 'WhitePawn', image: WhiteP }, row: 2, col: 'B' },
+    { piece: { type: 'WhitePawn', image: WhiteP }, row: 2, col: 'C' },
+    { piece: { type: 'WhitePawn', image: WhiteP }, row: 2, col: 'D' },
+    { piece: { type: 'WhitePawn', image: WhiteP }, row: 2, col: 'E' },
+    { piece: { type: 'WhitePawn', image: WhiteP }, row: 2, col: 'F' },
+    { piece: { type: 'WhitePawn', image: WhiteP }, row: 2, col: 'G' },
+    { piece: { type: 'WhitePawn', image: WhiteP }, row: 2, col: 'H' },
     // Row 1
-    { piece: { type: 'WhiteRook', image: WhiteRook }, row: 1, col: 'A' },
-    { piece: { type: 'WhiteKnight', image: WhiteKnight }, row: 1, col: 'B' },
-    { piece: { type: 'WhiteBishop', image: WhiteBishop }, row: 1, col: 'C' },
-    { piece: { type: 'WhiteQueen', image: WhiteQueen }, row: 1, col: 'D' },
-    { piece: { type: 'WhiteKing', image: WhiteKing }, row: 1, col: 'E' },
-    { piece: { type: 'WhiteBishop', image: WhiteBishop }, row: 1, col: 'F' },
-    { piece: { type: 'WhiteKnight', image: WhiteKnight }, row: 1, col: 'G' },
-    { piece: { type: 'WhiteRook', image: WhiteRook }, row: 1, col: 'H' },
+    { piece: { type: 'WhiteRook', image: WhiteR }, row: 1, col: 'A' },
+    { piece: { type: 'WhiteKnight', image: WhiteKn }, row: 1, col: 'B' },
+    { piece: { type: 'WhiteBishop', image: WhiteB }, row: 1, col: 'C' },
+    { piece: { type: 'WhiteQueen', image: WhiteQ }, row: 1, col: 'D' },
+    { piece: { type: 'WhiteKing', image: WhiteK }, row: 1, col: 'E' },
+    { piece: { type: 'WhiteBishop', image: WhiteB }, row: 1, col: 'F' },
+    { piece: { type: 'WhiteKnight', image: WhiteKn }, row: 1, col: 'G' },
+    { piece: { type: 'WhiteRook', image: WhiteR }, row: 1, col: 'H' },
 ];
 
 const BishopDirections = [
@@ -104,32 +107,33 @@ function ChessBoard() {
     const [isBoard, setBoard] = useState(initialBoard); //render the board
     const [selectedPiece, setSelectedPiece] = useState(null); // track the selected piece
     const [currentPlayer, setCurrentPlayer] = useState("White");
-
-
-    const checkGameState = (color: 'White' | 'Black') => {
-        
-        const fromSquare: Square = { row: 2, col: 'B'};
-const toSquare: Square = { row: 3, col: 'A' };
-        const newBoard = simulateMove(isBoard, fromSquare, toSquare);
-        console.log(newBoard);
-
-
-        if (isCheckmate(isBoard, color)) {
-            console.log(`${color} is in checkmate!`);
-        } else if (isKingInCheck(isBoard, color)) {
-            console.log(`${color} is in check!`);
-        } else {
-            console.log(`${color} is safe.`);
-
-        }
-    };
+    const [isPopupOpen, setPopupOpen] = useState(false);
+    const [isResetOpen, setReset] = useState(false);
+    const [isWhitePawnAtEnd, setWhitePawn] = useState(false);
+    const [isBlackPawnAtEnd, setBlackPawn] = useState(false);
+    const [isHighLighted, setHighLight] = useState<Square[]>([]);
+    const [stateCheckmate, setCheckmated] = useState(false);
+ 
 
 
 
     const reset = () => {
         setBoard(initialBoard);
         setCurrentPlayer("White");
+        setHighLight([]);
+        for (let i = 48; i <= 55; i++) {
+            const whatImLookingFor = isBoard[i];
+            if (whatImLookingFor.piece) {
+                if (!(whatImLookingFor.piece?.type.includes("WhitePawn"))) {
+                    whatImLookingFor.piece.type = "WhitePawn";
+                    whatImLookingFor.piece.image = WhiteP;
+                }
+            }
+
+        }
     }
+
+
     const switchTurn = () => {
         setCurrentPlayer((prevPlayer) => (prevPlayer === "White" ? "Black" : "White"));
         /* notes
@@ -142,23 +146,41 @@ const toSquare: Square = { row: 3, col: 'A' };
         */
     }
     const update = (index: any): void => {
-        if (selectedPiece === null) { // checking if no piece has been selected yet
-            if (isBoard[index].piece) { //checks if this square contains a piece
+
+
+        if (selectedPiece === null) {
+            // Selection logic remains the same
+            if (isBoard[index].piece) {
                 setSelectedPiece(index);
-                console.log("Piece selected:", isBoard[index].piece.type); //Piece selected: WhitePawn
+                console.log("Piece selected:", isBoard[index].piece.type);
             }
         } else {
-            const updatedArray = [...isBoard]; //make a copy
-            updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null }; // Remove the piece from the selected square
-            updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece }; // Add the piece to the new square
-            setBoard(updatedArray); // Update the board
-            setSelectedPiece(null); // Reset the selection
+            // Create the updated board
+            const updatedArray = [...isBoard];
+            updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
+            updatedArray[index] = { ...isBoard[index], piece: isBoard[selectedPiece].piece };
+
+            // Check game state with the new board before updating state
             const opponentColor = currentPlayer === "White" ? "Black" : "White";
-            checkGameState(opponentColor);
+            const isCheckmated = isCheckmate(updatedArray, opponentColor);
+
+            if (isCheckmated) {
+                switchTurn();
+                setCheckmated(true);
+                console.log(`${opponentColor} is in checkmate!`);
+                // Handle checkmate (show message, end game, etc.)
+            } else if (isKingInCheck(updatedArray, opponentColor)) {
+                //need a new function - give all valid moves to save the king
+                console.log(`${opponentColor} is in check!`);
+                const savingMoves = getValidMovesToSaveKing(isBoard, opponentColor);
+                console.log(savingMoves);
+            }
+
+            // Now update the state
+            setBoard(updatedArray);
+            setSelectedPiece(null);
             switchTurn();
         }
-
-
     }
     const checkForJump = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any): boolean => {
         //checking if you can jump over other peice
@@ -167,7 +189,6 @@ const toSquare: Square = { row: 3, col: 'A' };
             for (let i = selectedRow + 1; i < targetRow; i++) { //up
                 let checkIndex = (8 - i) * 8 + (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0));
                 if (isBoard[checkIndex].piece) {
-                    console.log("here");
                     flag = false;
                 }
             }
@@ -176,7 +197,6 @@ const toSquare: Square = { row: 3, col: 'A' };
             for (let i = selectedRow - 1; i > targetRow; i--) {//down
                 let checkIndex = (8 - i) * 8 + (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0));
                 if (isBoard[checkIndex].piece) {
-                    console.log("here2");
                     flag = false;
                 }
             }
@@ -185,7 +205,6 @@ const toSquare: Square = { row: 3, col: 'A' };
             for (let i = (selectedCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)) + 1; i <= (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)); i++) {//right
                 let checkIndex = (8 - targetRow) * 8 + i;
                 if (isBoard[checkIndex].piece) {
-                    console.log("here3");
                     flag = false;
                 }
             }
@@ -194,7 +213,6 @@ const toSquare: Square = { row: 3, col: 'A' };
             for (let i = (selectedCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)) - 1; i > (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)); i--) {//left
                 let checkIndex = (8 - targetRow) * 8 + i;
                 if (isBoard[checkIndex].piece) {
-                    console.log("here4");
                     flag = false;
                 }
             }
@@ -255,6 +273,12 @@ const toSquare: Square = { row: 3, col: 'A' };
         }
 
     }
+    const switchWhitePawn = () => {
+        setWhitePawn(true);
+    }
+    const switchBlackPawn = () => {
+        setBlackPawn(true);
+    }
     const WhitePawn = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
         if (selectedRow === 2) { //first row
             if ((targetRow === selectedRow + 2 && targetCol === selectedCol) && !isBoard[index].piece) { //move 2
@@ -282,19 +306,31 @@ const toSquare: Square = { row: 3, col: 'A' };
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
                 {
                     if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
-                        update(index);
+                        if (selectedRow == 7 && targetRow == 8) {
+                            update(index);
+                            switchWhitePawn();
+                        } else {
+                            update(index);
+                        }
                     }
                 }
             }
         }
         else if ((targetRow === selectedRow + 1 && targetCol === selectedCol) && !isBoard[index].piece) { //move 2
             if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
-                update(index);
+                if (selectedRow == 7 && targetRow == 8) {
+                    update(index);
+                    switchWhitePawn();
+                }
+                else {
+                    update(index);
+                }
             }
         }
 
     }
     const BlackPawn = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
+
         if (selectedRow === 7) { // First row for Black
             if ((targetRow === selectedRow - 2 && targetCol === selectedCol) && !isBoard[index].piece) { // Move 2 squares
                 if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
@@ -319,14 +355,24 @@ const toSquare: Square = { row: 3, col: 'A' };
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("White")) {
                 {
                     if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
-                        update(index);
+                        if (selectedRow == 2 && targetRow == 1) {
+                            update(index);
+                            switchBlackPawn();
+                        } else {
+                            update(index);
+                        }
                     }
                 }
             }
         }
         else if ((targetRow === selectedRow - 1 && targetCol === selectedCol) && !isBoard[index].piece) { //move 2
             if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
-                update(index);
+                if (selectedRow == 2 && targetRow == 1) {
+                    update(index);
+                    switchBlackPawn();
+                } else {
+                    update(index);
+                }
             }
         }
 
@@ -595,24 +641,89 @@ const toSquare: Square = { row: 3, col: 'A' };
         }
     }
     const WhiteQueen = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
-        WhitePawn(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-        WhiteRook(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-        WhiteBishop(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-        WhiteKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+        const isValidRookMove = ((targetRow === selectedRow) || (targetCol === selectedCol)) &&
+            checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+        const isValidBishopMove = checkForJumpBishops(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+        const hasOpponentPiece = isBoard[index].piece && isBoard[index].piece?.type.includes("Black");
+
+        // If the move is valid and either the square is empty or has an opponent's piece
+        if ((isValidRookMove || isValidBishopMove) && (!isBoard[index].piece || hasOpponentPiece)) {
+            update(index);
+        }
     }
     const BlackQueen = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
-        BlackPawn(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-        BlackRook(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-        BlackBishop(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-        BlackKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-    }
+        const isValidRookMove = ((targetRow === selectedRow) || (targetCol === selectedCol)) &&
+            checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
 
+        const isValidBishopMove = checkForJumpBishops(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+        const hasOpponentPiece = isBoard[index].piece && isBoard[index].piece?.type.includes("White");
+        // If the move is valid and either the square is empty or has an opponent's piece
+        if ((isValidRookMove || isValidBishopMove) && (!isBoard[index].piece || hasOpponentPiece)) {
+            update(index);
+        }
+    }
+    const changePawn = (thePickedPiece: String) => {
+
+        if (currentPlayer !== "White") {
+            for (let i = 0; i <= 7; i++) {
+                const whatImLookingFor = isBoard[i];
+                if (whatImLookingFor.piece?.type.includes("WhitePawn")) {
+                    if (thePickedPiece === "Queen") {
+                        whatImLookingFor.piece.type = "WhiteQueen";
+                        whatImLookingFor.piece.image = WhiteQ;
+                    }
+                    else if (thePickedPiece === "Rook") {
+                        whatImLookingFor.piece.type = "WhiteRook";
+                        whatImLookingFor.piece.image = WhiteR;
+                    }
+                    else if (thePickedPiece === "Bishop") {
+                        whatImLookingFor.piece.type = "WhiteBishop";
+                        whatImLookingFor.piece.image = WhiteB;
+                    }
+                    else if (thePickedPiece === "Knight") {
+                        whatImLookingFor.piece.type = "WhiteKnight";
+                        whatImLookingFor.piece.image = WhiteKn;
+                    }
+                }
+            }
+        }
+        if (currentPlayer !== "Black") {
+            for (let i = 56; i <= 63; i++) {
+                const whatImLookingFor = isBoard[i];
+                if (whatImLookingFor.piece?.type.includes("BlackPawn")) {
+                    if (thePickedPiece === "Queen") {
+                        whatImLookingFor.piece.type = "BlackQueen";
+                        whatImLookingFor.piece.image = BlackQ;
+                    }
+                    else if (thePickedPiece === "Rook") {
+                        whatImLookingFor.piece.type = "BlackRook";
+                        whatImLookingFor.piece.image = BlackR;
+                    }
+                    else if (thePickedPiece === "Bishop") {
+                        whatImLookingFor.piece.type = "BlackBishop";
+                        whatImLookingFor.piece.image = BlackB;
+                    }
+                    else if (thePickedPiece === "Knight") {
+                        whatImLookingFor.piece.type = "BlackKnight";
+                        whatImLookingFor.piece.image = BlackKn;
+                    }
+                }
+            }
+        }
+
+    }
+    const highLight = (pieceToMove: any) => {
+        const moves = getValidMoves(isBoard, pieceToMove);
+        setHighLight(moves);
+    }
 
     const handleClick = (index: any) => {
         if (selectedPiece === null) { // checking if no piece has been selected yet
             if (isBoard[index].piece) { //checks if this square contains a piece
                 setSelectedPiece(index);
-                console.log("Piece selected:", isBoard[index].piece.type); //Piece selected: WhitePawn
+                const highLightProp = isBoard[index];
+                highLight(highLightProp);
+                // console.log("Piece selected:", isBoard[index].piece.type); //Piece selected: WhitePawn
             }
         } else {
             const selectedRow = isBoard[selectedPiece].row;
@@ -704,22 +815,163 @@ const toSquare: Square = { row: 3, col: 'A' };
 
         }
     };
+
+
+
+
     return (
         <main className="flex items-center justify-center h-screen">
             <div>
-                <p>Current Turn: {currentPlayer}</p>
-
-                <Popup trigger={<button> Reset</button>} position="right center">
-                    <button onClick={() => reset()} className="bg-red-500 border-2 border-black">Reset</button>
+                <button onClick={() => setReset(true)} className="mb-2 mt-2 mr-2 px-6 py-2 bg-gray-300 rounded hover:bg-gray-200 font-serif">Reset </button>
+                <button onClick={() => setPopupOpen(true)} className="mb-2 mt-2 px-6 py-2 bg-gray-300 rounded  hover:bg-gray-200 font-serif">Draw </button>
+                <Popup
+                    open={isPopupOpen}
+                    onClose={() => setPopupOpen(false)}
+                >
+                    <div className="bg-gray-300 rounded p-4 max-w-sm mx-auto text-center">
+                        <p className="mb-4 text-lg font-medium font-serif">Would you like to draw?</p>
+                        <div className="flex justify-center gap-4">
+                            <button
+                                onClick={() => {
+                                    setPopupOpen(false);
+                                    reset();
+                                }}
+                                className="px-6 py-2 bg-red-500 text-white rounded font-serif hover:bg-red-600 transition-colors"
+                            >
+                                Yes
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setPopupOpen(false);
+                                }}
+                                className="px-6 py-2 bg-red-500 text-white rounded font-serif hover:bg-red-600 transition-colors"
+                            >
+                                No
+                            </button>
+                        </div>
+                    </div>
                 </Popup>
+
+                <Popup
+                    open={isResetOpen}
+                    onClose={() => setReset(false)}
+                >
+                    <div className="bg-gray-300 rounded p-4 max-w-sm mx-auto text-center">
+                        <p className="mb-4 text-lg font-medium font-serif">Are you sure you want to reset?</p>
+                        <div className="flex justify-center gap-4">
+                            <button
+                                onClick={() => {
+                                    setReset(false);
+                                    reset();
+                                }}
+                                className="px-6 py-2 bg-red-500 text-white rounded font-serif hover:bg-red-600 transition-colors"
+                            >
+                                Yes
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setReset(false);
+                                }}
+                                className="px-6 py-2 bg-red-500 text-white rounded font-serif hover:bg-red-600 transition-colors"
+                            >
+                                No
+                            </button>
+                        </div>
+                    </div>
+                </Popup>
+                <Popup
+                    open={stateCheckmate}
+                    onClose={() => setCheckmated(false)}
+                >
+                    <div className="bg-gray-300 rounded p-4 max-w-sm mx-auto text-center">
+                        <p className="mb-4 text-lg font-medium font-serif">{currentPlayer} is the winner by checkmate!</p>
+                        <div className="flex justify-center gap-4">
+                            <button
+                                onClick={() => {
+                                    setCheckmated(false);
+                                    reset();
+                                }}
+                                className="px-6 py-2 bg-red-500 text-white rounded font-serif hover:bg-red-600 transition-colors"
+                            >
+                                Play Again
+                            </button>
+                        </div>
+                    </div>
+                </Popup>
+
+
+                <p className="mb-2 mt-2 px-6 py-2 bg-gray-300 rounded text-center font-serif">Current Turn: {currentPlayer}</p>
+
+
+
+                <Popup open={isWhitePawnAtEnd} closeOnDocumentClick={false} modal>
+                    <button onClick={() => {
+                        { setWhitePawn(false), changePawn("Rook"); }
+                    }} className="px-3 py-2  bg-red-500 ">
+                        <Image src={WhiteR} alt="White Rook" width={50} height={50} />
+                    </button>
+                    <button onClick={() => {
+                        { setWhitePawn(false), changePawn("Bishop"); }
+                    }} className="px-3 py-2  bg-red-500 ">
+                        <Image src={WhiteB} alt="White Bishop" width={50} height={50} />
+                    </button>
+                    <button onClick={() => {
+                        { setWhitePawn(false), changePawn("Knight"); }
+                    }} className="px-3 py-2  bg-red-500 ">
+                        <Image src={WhiteKn} alt="White Knight" width={50} height={50} />
+                    </button>
+                    <button onClick={() => {
+                        { setWhitePawn(false), changePawn("Queen"); }
+                    }} className="px-3 py-2  bg-red-500 ">
+                        <Image src={WhiteQ} alt="White Queen" width={50} height={50} />
+
+                    </button>
+
+                </Popup>
+
+                <Popup open={isBlackPawnAtEnd} closeOnDocumentClick={false} modal>
+                    <button onClick={() => {
+                        { setBlackPawn(false), changePawn("Rook"); }
+                    }} className="px-3 py-2  bg-red-500">
+                        <Image src={BlackR} alt="Black Rook" width={50} height={50} />
+                    </button>
+                    <button onClick={() => {
+                        { setBlackPawn(false), changePawn("Bishop"); }
+                    }} className="px-3 py-2  bg-red-500 ">
+                        <Image src={BlackB} alt="Black Bishop" width={50} height={50} />
+                    </button>
+                    <button onClick={() => {
+                        { setBlackPawn(false), changePawn("Knight"); }
+                    }} className="px-3 py-2  bg-red-500 ">
+                        <Image src={BlackKn} alt="Black Knight" width={50} height={50} />
+                    </button>
+                    <button onClick={() => {
+                        { setBlackPawn(false), changePawn("Queen"); }
+                    }} className="px-3 py-2  bg-red-500 ">
+                        <Image src={BlackQ} alt="Black Queen" width={50} height={50} />
+
+                    </button>
+
+                </Popup>
+
+
                 <div className="grid grid-cols-8 grid-rows-8 border-4 border-black h-96 w-96 ">
                     {isBoard.map((square, index) => ( //looping through the array
                         <div
-                            className={`square${(index + Math.floor(index / 8)) % 2}`} //this is giving square0 or square1
+                            className={`square${(index + Math.floor(index / 8)) % 2} ${isHighLighted.some(square =>
+                                square.row === isBoard[index].row &&
+                                square.col === isBoard[index].col
+                            ) ? 'highlight' : ''
+                                }  `}
                             key={index} //  unique identifier for each element -helps when rerendering
-                            onClick={() =>
-                                handleClick(index)
+                            onClick={() => {
+                                handleClick(index);
+                          
                             }
+
+
+                            }
+                          
                         >
                             {square.piece && (
                                 <Image
@@ -731,12 +983,11 @@ const toSquare: Square = { row: 3, col: 'A' };
                                 />)}
 
                             <span className="absolute top-1 left-1 text-xs text-black">
-                                {square.row}{square.col}
+                                {square.row}{square.col}{index}
                             </span>
                         </div>
                     ))}
                 </div>
-
             </div>
 
 
