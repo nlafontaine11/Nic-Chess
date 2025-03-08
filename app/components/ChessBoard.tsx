@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react";
-import Image from 'next/image';
+import Image, { StaticImageData } from 'next/image';
 import { findKing, getValidMoves, getValidMovesToSaveKing, isCheckmate, isKingInCheck, Square } from "./checkMate";
 import Popup from "reactjs-popup";
 
@@ -113,14 +113,20 @@ function ChessBoard() {
     const [isBlackPawnAtEnd, setBlackPawn] = useState(false);
     const [isHighLighted, setHighLight] = useState<Square[]>([]);
     const [stateCheckmate, setCheckmated] = useState(false);
- 
+    const [isInCheck, setIsInCheck] = useState(false);
+    const [allowedMoves, setAllowedMoves] = useState<Move[]>([]);
 
 
+    type Move = {
+        from: Square;
+        to: Square;
+    };
 
     const reset = () => {
         setBoard(initialBoard);
         setCurrentPlayer("White");
         setHighLight([]);
+        setIsInCheck(false);
         for (let i = 48; i <= 55; i++) {
             const whatImLookingFor = isBoard[i];
             if (whatImLookingFor.piece) {
@@ -145,9 +151,19 @@ function ChessBoard() {
         if false again on black then deflaut to white
         */
     }
+    // Function to validate if a move resolves check
+    const isValidMoveInCheck = (from: number, to: number, allowedMoves: Move[]): boolean => {
+        // Flatten the array if it's nested (since savingMoves seems to be passed as a nested array)
+        const flatMoves = Array.isArray(allowedMoves[0]) ? allowedMoves[0] : allowedMoves;
+
+        // Look for a matching move in the allowed moves
+        return flatMoves.some(move => {
+            const fromMatch = move.from.row === isBoard[from].row && move.from.col === isBoard[from].col;
+            const toMatch = move.to.row === isBoard[to].row && move.to.col === isBoard[to].col;
+            return fromMatch && toMatch;
+        });
+    };
     const update = (index: any): void => {
-
-
         if (selectedPiece === null) {
             // Selection logic remains the same
             if (isBoard[index].piece) {
@@ -155,6 +171,13 @@ function ChessBoard() {
                 console.log("Piece selected:", isBoard[index].piece.type);
             }
         } else {
+            // Check if we're in check and if this is a valid move to resolve it
+            if (isInCheck && !isValidMoveInCheck(selectedPiece, index, allowedMoves)) {
+                console.log("Invalid move: King is in check");
+                setSelectedPiece(null);
+                return;
+            }
+
             // Create the updated board
             const updatedArray = [...isBoard];
             updatedArray[selectedPiece] = { ...isBoard[selectedPiece], piece: null };
@@ -168,20 +191,23 @@ function ChessBoard() {
                 switchTurn();
                 setCheckmated(true);
                 console.log(`${opponentColor} is in checkmate!`);
-                // Handle checkmate (show message, end game, etc.)
             } else if (isKingInCheck(updatedArray, opponentColor)) {
-                //need a new function - give all valid moves to save the king
                 console.log(`${opponentColor} is in check!`);
-                const savingMoves = getValidMovesToSaveKing(isBoard, opponentColor);
-                console.log(savingMoves);
+                const savingMoves = getValidMovesToSaveKing(updatedArray, opponentColor);
+                setIsInCheck(true);
+                setAllowedMoves(savingMoves);
+                console.log("Saving moves:", savingMoves);
+            } else {
+                // If the move resolves check, reset the check status
+                setIsInCheck(false);
             }
 
-            // Now update the state
             setBoard(updatedArray);
             setSelectedPiece(null);
+            setHighLight([]);
             switchTurn();
         }
-    }
+    };
     const checkForJump = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any): boolean => {
         //checking if you can jump over other peice
         let flag = true;
@@ -716,106 +742,73 @@ function ChessBoard() {
         const moves = getValidMoves(isBoard, pieceToMove);
         setHighLight(moves);
     }
-
+    // Modify the handleClick function to incorporate check validation
     const handleClick = (index: any) => {
-        if (selectedPiece === null) { // checking if no piece has been selected yet
-            if (isBoard[index].piece) { //checks if this square contains a piece
-                setSelectedPiece(index);
-                const highLightProp = isBoard[index];
-                highLight(highLightProp);
-                // console.log("Piece selected:", isBoard[index].piece.type); //Piece selected: WhitePawn
+        if (selectedPiece === null) {
+            if (isBoard[index].piece) {
+                // Only allow selecting pieces of the current player
+                if ((currentPlayer === "White" && isBoard[index].piece?.type.includes("White")) ||
+                    (currentPlayer === "Black" && isBoard[index].piece?.type.includes("Black"))) {
+                    setSelectedPiece(index);
+                    const highLightProp = isBoard[index];
+                    highLight(highLightProp);
+                }
             }
         } else {
             const selectedRow = isBoard[selectedPiece].row;
             const selectedCol = isBoard[selectedPiece].col;
             const targetRow = isBoard[index].row;
             const targetCol = isBoard[index].col;
-            // console.log("selectedRow "+ selectedRow)
-            // console.log("targetRow "+ targetRow)
-            // console.log("targetCol "+ targetCol)
-            // console.log("selectedCol "+ selectedCol)
 
+            // If in check, validate the move against allowed moves before proceeding
+            if (isInCheck) {
+                if (!isValidMoveInCheck(selectedPiece, index, allowedMoves)) {
+                    console.log("Invalid move: King is in check");
+                    setSelectedPiece(null);
+                    setHighLight([]);
+                    return;
+                }
+            }
+
+            // Rest of your move handling logic remains the same
             if (currentPlayer === "White") {
                 if (isBoard[selectedPiece].piece?.type === "WhitePawn") {
                     WhitePawn(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-                } else {
-                    setSelectedPiece(null);
-                }
-                if (isBoard[selectedPiece].piece?.type === "WhiteKnight") {
+                } else if (isBoard[selectedPiece].piece?.type === "WhiteKnight") {
                     WhiteKnight(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-                } else {
-                    setSelectedPiece(null);
-                }
-                if (isBoard[selectedPiece].piece?.type === "WhiteRook") {
+                } else if (isBoard[selectedPiece].piece?.type === "WhiteRook") {
                     WhiteRook(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-
-                } else {
-                    setSelectedPiece(null);
-                }
-                if (isBoard[selectedPiece].piece?.type === "WhiteBishop") {
+                } else if (isBoard[selectedPiece].piece?.type === "WhiteBishop") {
                     WhiteBishop(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-
-                } else {
-                    setSelectedPiece(null);
-                }
-                if (isBoard[selectedPiece].piece?.type === "WhiteKing") {
+                } else if (isBoard[selectedPiece].piece?.type === "WhiteKing") {
                     WhiteKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-
-                } else {
-                    setSelectedPiece(null);
-                }
-                if (isBoard[selectedPiece].piece?.type === "WhiteQueen") {
+                } else if (isBoard[selectedPiece].piece?.type === "WhiteQueen") {
                     WhiteQueen(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-
                 } else {
                     setSelectedPiece(null);
+                    setHighLight([]);
                 }
-
-            }
-
-            if (currentPlayer === "Black") {
+            } else if (currentPlayer === "Black") {
+                // Similar logic for Black pieces
                 if (isBoard[selectedPiece].piece?.type === "BlackPawn") {
                     BlackPawn(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-                } else {
-                    setSelectedPiece(null);
-                }
-
-                if (isBoard[selectedPiece].piece?.type === "BlackKnight") {
+                } else if (isBoard[selectedPiece].piece?.type === "BlackKnight") {
                     BlackKnight(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-                } else {
-                    setSelectedPiece(null);
-                }
-
-                if (isBoard[selectedPiece].piece?.type === "BlackRook") {
+                } else if (isBoard[selectedPiece].piece?.type === "BlackRook") {
                     BlackRook(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-                } else {
-                    setSelectedPiece(null);
-                }
-
-                if (isBoard[selectedPiece].piece?.type === "BlackBishop") {
+                } else if (isBoard[selectedPiece].piece?.type === "BlackBishop") {
                     BlackBishop(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-                } else {
-                    setSelectedPiece(null);
-                }
-
-                if (isBoard[selectedPiece].piece?.type === "BlackKing") {
+                } else if (isBoard[selectedPiece].piece?.type === "BlackKing") {
                     BlackKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-                } else {
-                    setSelectedPiece(null);
-                }
-
-                if (isBoard[selectedPiece].piece?.type === "BlackQueen") {
+                } else if (isBoard[selectedPiece].piece?.type === "BlackQueen") {
                     BlackQueen(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
                 } else {
                     setSelectedPiece(null);
+                    setHighLight([]);
                 }
             }
-
-
-
         }
     };
-
 
 
 
@@ -966,12 +959,12 @@ function ChessBoard() {
                             key={index} //  unique identifier for each element -helps when rerendering
                             onClick={() => {
                                 handleClick(index);
-                          
+
                             }
 
 
                             }
-                          
+
                         >
                             {square.piece && (
                                 <Image

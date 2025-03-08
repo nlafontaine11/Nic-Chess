@@ -253,7 +253,12 @@ export const getSlidingMoves = (board: Board, square: Square, color: string, dir
 // where I stopped last
 export const getValidMovesToSaveKing = (board: Board, color: string): { from: Square, to: Square }[] => {
     const validSavingMoves: { from: Square, to: Square }[] = [];
+    const kingInCheck = isKingInCheck(board, color);
+    if (!kingInCheck) {
+        return validSavingMoves;
+    }
     
+
     // Find all pieces of this color
     const playerPieces = board.filter(square =>
         square.piece && square.piece.type.includes(color)
@@ -268,7 +273,7 @@ export const getValidMovesToSaveKing = (board: Board, color: string): { from: Sq
             const simulatedBoard = simulateMove(board, piece, move);
             const stillInCheck = isKingInCheck(simulatedBoard, color);
             
-            if (stillInCheck) {
+            if (!stillInCheck) {
                 // This move saves the king
                 validSavingMoves.push({ from: piece, to: move });
             }
