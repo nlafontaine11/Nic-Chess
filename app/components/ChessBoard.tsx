@@ -976,7 +976,7 @@ function ChessBoard() {
                                 />)}
 
                             <span className="absolute top-1 left-1 text-xs text-black">
-                                {square.row}{square.col}{index}
+                                {square.row}{square.col}
                             </span>
                         </div>
                     ))}
