@@ -1,7 +1,7 @@
 'use client'
 import { useState } from "react";
-import Image, { StaticImageData } from 'next/image';
-import { findKing, getValidMoves, getValidMovesToSaveKing, isCheckmate, isKingInCheck, Square } from "./checkMate";
+import Image from 'next/image';
+import { getValidMoves, getValidMovesToSaveKing, isCheckmate, isKingInCheck, Square } from "./checkMate";
 import Popup from "reactjs-popup";
 
 import WhiteP from '../assets/Chess_plt60.png';
@@ -742,8 +742,14 @@ function ChessBoard() {
         const moves = getValidMoves(isBoard, pieceToMove);
         setHighLight(moves);
     }
-    // Modify the handleClick function to incorporate check validation
+
     const handleClick = (index: any) => {
+        if (selectedPiece === index) {
+            setSelectedPiece(null);
+            setHighLight([]);
+            return;
+        }
+    
         if (selectedPiece === null) {
             if (isBoard[index].piece) {
                 // Only allow selecting pieces of the current player
