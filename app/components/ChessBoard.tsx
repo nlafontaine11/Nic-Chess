@@ -306,7 +306,7 @@ function ChessBoard() {
     const switchBlackPawn = () => {
         setBlackPawn(true);
     }
-    const WhitePawn = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
+    const WhitePawn = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         if (selectedRow === 2) { //first row
             if ((targetRow === selectedRow + 2 && targetCol === selectedCol) && !isBoard[index].piece) { //move 2
                 if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
@@ -356,7 +356,7 @@ function ChessBoard() {
         }
 
     }
-    const BlackPawn = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
+    const BlackPawn = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
 
         if (selectedRow === 7) { // First row for Black
             if ((targetRow === selectedRow - 2 && targetCol === selectedCol) && !isBoard[index].piece) { // Move 2 squares
@@ -404,7 +404,7 @@ function ChessBoard() {
         }
 
     }
-    const WhiteKnight = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
+    const WhiteKnight = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         if ((targetRow === selectedRow + 2 && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) || (targetRow === selectedRow + 2 && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) { // 2 rows up and 1 col left or right
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
                 {
@@ -446,7 +446,7 @@ function ChessBoard() {
             update(index);
         }
     }
-    const BlackKnight = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
+    const BlackKnight = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         if ((targetRow === selectedRow + 2 && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) || (targetRow === selectedRow + 2 && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) { // 2 rows up and 1 col left or right
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("White")) {
                 {
@@ -489,7 +489,7 @@ function ChessBoard() {
             update(index);
         }
     }
-    const WhiteRook = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
+    const WhiteRook = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         if (((targetRow === selectedRow) || (targetCol === selectedCol)) && !isBoard[index].piece) {
             if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
                 update(index);
@@ -505,7 +505,7 @@ function ChessBoard() {
             }
         }
     }
-    const BlackRook = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
+    const BlackRook = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         if (((targetRow === selectedRow) || (targetCol === selectedCol)) && !isBoard[index].piece) {
             if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
                 update(index);
@@ -521,7 +521,7 @@ function ChessBoard() {
             }
         }
     }
-    const WhiteBishop = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
+    const WhiteBishop = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         for (const { row: rowDir, col: colDir } of BishopDirections) {
             let currentRow = selectedRow;
             let currentCol = selectedCol;
@@ -547,7 +547,7 @@ function ChessBoard() {
             }
         }
     }
-    const BlackBishop = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
+    const BlackBishop = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         for (const { row: rowDir, col: colDir } of BishopDirections) {
             let currentRow = selectedRow;
             let currentCol = selectedCol;
@@ -569,7 +569,7 @@ function ChessBoard() {
             }
         }
     }
-    const WhiteKing = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
+    const WhiteKing = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
 
         if (((targetRow === selectedRow + 1) && (targetCol === selectedCol)) || ((targetRow === selectedRow - 1) && targetCol === selectedCol)) {
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
@@ -619,7 +619,7 @@ function ChessBoard() {
         }
 
     }
-    const BlackKing = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
+    const BlackKing = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         if (((targetRow === selectedRow + 1) && (targetCol === selectedCol)) || ((targetRow === selectedRow - 1) && targetCol === selectedCol)) {
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("White")) {
                 {
@@ -667,7 +667,7 @@ function ChessBoard() {
             update(index);
         }
     }
-    const WhiteQueen = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
+    const WhiteQueen = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         const isValidRookMove = ((targetRow === selectedRow) || (targetCol === selectedCol)) &&
             checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
         const isValidBishopMove = checkForJumpBishops(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
@@ -678,7 +678,7 @@ function ChessBoard() {
             update(index);
         }
     }
-    const BlackQueen = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any) => {
+    const BlackQueen = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         const isValidRookMove = ((targetRow === selectedRow) || (targetCol === selectedCol)) &&
             checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
 
@@ -689,7 +689,7 @@ function ChessBoard() {
             update(index);
         }
     }
-    const changePawn = (thePickedPiece: String) => {
+    const changePawn = (thePickedPiece: string) => {
 
         if (currentPlayer !== "White") {
             for (let i = 0; i <= 7; i++) {
