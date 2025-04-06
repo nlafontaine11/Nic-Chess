@@ -309,20 +309,20 @@ function ChessBoard() {
     const WhitePawn = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         if (selectedRow === 2) { //first row
             if ((targetRow === selectedRow + 2 && targetCol === selectedCol) && !isBoard[index].piece) { //move 2
-                if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                     update(index);
                 }
 
             }
             else if ((targetRow === selectedRow + 1 && targetCol === selectedCol) && !isBoard[index].piece) { //move 2
-                if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                     update(index);
                 }
             }
             else if ((targetRow === selectedRow + 1) && (targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1) || targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) {
                 if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
                     {
-                        if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                        if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                             update(index);
                         }
                     }
@@ -332,7 +332,7 @@ function ChessBoard() {
         else if ((targetRow === selectedRow + 1) && (targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1) || targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) {
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
                 {
-                    if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                    if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                         if (selectedRow == 7 && targetRow == 8) {
                             update(index);
                             switchWhitePawn();
@@ -344,7 +344,7 @@ function ChessBoard() {
             }
         }
         else if ((targetRow === selectedRow + 1 && targetCol === selectedCol) && !isBoard[index].piece) { //move 2
-            if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+            if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                 if (selectedRow == 7 && targetRow == 8) {
                     update(index);
                     switchWhitePawn();
@@ -360,19 +360,19 @@ function ChessBoard() {
 
         if (selectedRow === 7) { // First row for Black
             if ((targetRow === selectedRow - 2 && targetCol === selectedCol) && !isBoard[index].piece) { // Move 2 squares
-                if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                     update(index);
                 }
             }
             else if ((targetRow === selectedRow - 1 && targetCol === selectedCol) && !isBoard[index].piece) { // Move 1 square
-                if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                     update(index);
                 }
             }
             else if ((targetRow === selectedRow - 1) && (targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1) || targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) {
                 if (isBoard[index].piece && isBoard[index].piece?.type.includes("White")) {
                     {
-                        if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                        if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                             update(index);
                         }
                     }
@@ -381,7 +381,7 @@ function ChessBoard() {
         } else if ((targetRow === selectedRow - 1) && (targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1) || targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) {
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("White")) {
                 {
-                    if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                    if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                         if (selectedRow == 2 && targetRow == 1) {
                             update(index);
                             switchBlackPawn();
@@ -393,7 +393,7 @@ function ChessBoard() {
             }
         }
         else if ((targetRow === selectedRow - 1 && targetCol === selectedCol) && !isBoard[index].piece) { //move 2
-            if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+            if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                 if (selectedRow == 2 && targetRow == 1) {
                     update(index);
                     switchBlackPawn();
@@ -491,14 +491,14 @@ function ChessBoard() {
     }
     const WhiteRook = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         if (((targetRow === selectedRow) || (targetCol === selectedCol)) && !isBoard[index].piece) {
-            if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+            if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                 update(index);
             }
         }
         else if (((targetRow === selectedRow) || (targetCol === selectedCol))) {
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
                 {
-                    if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                    if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                         update(index);
                     }
                 }
@@ -507,14 +507,14 @@ function ChessBoard() {
     }
     const BlackRook = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         if (((targetRow === selectedRow) || (targetCol === selectedCol)) && !isBoard[index].piece) {
-            if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+            if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                 update(index);
             }
         }
         else if (((targetRow === selectedRow) || (targetCol === selectedCol))) {
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("White")) {
                 {
-                    if (checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                    if (checkForJump(targetRow, selectedRow, targetCol, selectedCol)) {
                         update(index);
                     }
                 }
@@ -529,14 +529,14 @@ function ChessBoard() {
                 currentRow += rowDir;
                 currentCol = String.fromCharCode(currentCol.charCodeAt(0) + colDir);
                 if ((currentRow === targetRow && currentCol === targetCol) && !isBoard[index].piece) {
-                    if (checkForJumpBishops(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                    if (checkForJumpBishops(targetRow, selectedRow, targetCol, selectedCol)) {
                         update(index);
                     }
                     return;
                 }
                 else if ((currentRow === targetRow && currentCol === targetCol)) {
                     if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
-                        if (checkForJumpBishops(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index)) {
+                        if (checkForJumpBishops(targetRow, selectedRow, targetCol, selectedCol)) {
                             update(index);
                         }
                         return;
@@ -669,8 +669,8 @@ function ChessBoard() {
     }
     const WhiteQueen = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         const isValidRookMove = ((targetRow === selectedRow) || (targetCol === selectedCol)) &&
-            checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
-        const isValidBishopMove = checkForJumpBishops(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+            checkForJump(targetRow, selectedRow, targetCol, selectedCol);
+        const isValidBishopMove = checkForJumpBishops(targetRow, selectedRow, targetCol, selectedCol);
         const hasOpponentPiece = isBoard[index].piece && isBoard[index].piece?.type.includes("Black");
 
         // If the move is valid and either the square is empty or has an opponent's piece
@@ -680,9 +680,9 @@ function ChessBoard() {
     }
     const BlackQueen = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
         const isValidRookMove = ((targetRow === selectedRow) || (targetCol === selectedCol)) &&
-            checkForJump(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+            checkForJump(targetRow, selectedRow, targetCol, selectedCol);
 
-        const isValidBishopMove = checkForJumpBishops(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+        const isValidBishopMove = checkForJumpBishops(targetRow, selectedRow, targetCol, selectedCol);
         const hasOpponentPiece = isBoard[index].piece && isBoard[index].piece?.type.includes("White");
         // If the move is valid and either the square is empty or has an opponent's piece
         if ((isValidRookMove || isValidBishopMove) && (!isBoard[index].piece || hasOpponentPiece)) {
@@ -782,13 +782,13 @@ function ChessBoard() {
                 if (isBoard[selectedPiece].piece?.type === "WhitePawn") {
                     WhitePawn(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
                 } else if (isBoard[selectedPiece].piece?.type === "WhiteKnight") {
-                    WhiteKnight(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                    WhiteKnight(targetRow, selectedRow, targetCol, selectedCol, selectedPiece);
                 } else if (isBoard[selectedPiece].piece?.type === "WhiteRook") {
                     WhiteRook(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
                 } else if (isBoard[selectedPiece].piece?.type === "WhiteBishop") {
                     WhiteBishop(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
                 } else if (isBoard[selectedPiece].piece?.type === "WhiteKing") {
-                    WhiteKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                    WhiteKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece);
                 } else if (isBoard[selectedPiece].piece?.type === "WhiteQueen") {
                     WhiteQueen(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
                 } else {
@@ -800,13 +800,13 @@ function ChessBoard() {
                 if (isBoard[selectedPiece].piece?.type === "BlackPawn") {
                     BlackPawn(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
                 } else if (isBoard[selectedPiece].piece?.type === "BlackKnight") {
-                    BlackKnight(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                    BlackKnight(targetRow, selectedRow, targetCol, selectedCol, selectedPiece);
                 } else if (isBoard[selectedPiece].piece?.type === "BlackRook") {
                     BlackRook(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
                 } else if (isBoard[selectedPiece].piece?.type === "BlackBishop") {
-                    BlackBishop(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                    BlackBishop(targetRow, selectedRow, targetCol, selectedCol, selectedPiece);
                 } else if (isBoard[selectedPiece].piece?.type === "BlackKing") {
-                    BlackKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
+                    BlackKing(targetRow, selectedRow, targetCol, selectedCol, selectedPiece);
                 } else if (isBoard[selectedPiece].piece?.type === "BlackQueen") {
                     BlackQueen(targetRow, selectedRow, targetCol, selectedCol, selectedPiece, index);
                 } else {
