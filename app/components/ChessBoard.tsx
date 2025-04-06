@@ -154,7 +154,7 @@ function ChessBoard() {
     }
     // Function to validate if a move resolves check
     const isValidMoveInCheck = (from: number, to: number, allowedMoves: Move[]): boolean => {
-        // Flatten the array if it's nested (since savingMoves seems to be passed as a nested array)
+        // Flatten the array 
         const flatMoves = Array.isArray(allowedMoves[0]) ? allowedMoves[0] : allowedMoves;
 
         // Look for a matching move in the allowed moves

@@ -14,7 +14,6 @@ export type Square = {
 export type Board = Square[];
 
 
-//i like
 export const findKing = (board: Board, color: string) => {
     if (color === 'Black') {
         return board.find(square => square.piece?.type === 'BlackKing');
@@ -24,8 +23,8 @@ export const findKing = (board: Board, color: string) => {
     }
 };
 
-// Fix the isKingInCheck function
-// Detailed debug version of isKingInCheck
+
+
 export const isKingInCheck = (board: Board, color: string): boolean => {
     const king = findKing(board, color);
     if (!king) {
@@ -56,15 +55,11 @@ export const isKingInCheck = (board: Board, color: string): boolean => {
     return false;
 }
 
-// First, fix the letterToIndex function to handle both uppercase and lowercase
+
 const letterToIndex = (letter: string): number => {
     return letter.toLowerCase().charCodeAt(0) - 'a'.charCodeAt(0);
 };
 
-// const indexToLetter = (index: number): string => {
-//     // Return uppercase to match your board representation
-//     return String.fromCharCode(index + 'A'.charCodeAt(0));
-// };
 
 // Simulate a move and return the new board state
 export const simulateMove = (board: Board, from: Square, to: Square): Board => {
@@ -164,7 +159,7 @@ export const getBishopMoves = (board: Board, square: Square, color: string): Squ
 };
 
 
-// Fix the queen moves generation
+
 export const getQueenMoves = (board: Board, square: Square, color: string): Square[] => {
     // Queen combines rook and bishop movements
     // Get all horizontal and vertical moves (rook-like)
@@ -282,7 +277,7 @@ export const getValidMovesToSaveKing = (board: Board, color: string): { from: Sq
     
     return validSavingMoves;
 };
-// More robust checkmate detection
+// better checkmate detection
 export const isCheckmate = (board: Board, color: string): boolean => {
     // First check if king is in check
     if (!isKingInCheck(board, color)) {
