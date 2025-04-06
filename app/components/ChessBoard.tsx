@@ -906,22 +906,22 @@ function ChessBoard() {
 
                 <Popup open={isWhitePawnAtEnd} closeOnDocumentClick={false} modal>
                     <button onClick={() => {
-                         setWhitePawn(false), changePawn("Rook"); 
+                         setWhitePawn(false); changePawn("Rook"); 
                     }} className="px-3 py-2  bg-red-500 ">
                         <Image src={WhiteR} alt="White Rook" width={50} height={50} />
                     </button>
                     <button onClick={() => {
-                         setWhitePawn(false), changePawn("Bishop"); 
+                         setWhitePawn(false); changePawn("Bishop"); 
                     }} className="px-3 py-2  bg-red-500 ">
                         <Image src={WhiteB} alt="White Bishop" width={50} height={50} />
                     </button>
                     <button onClick={() => {
-                         setWhitePawn(false), changePawn("Knight"); 
+                         setWhitePawn(false); changePawn("Knight"); 
                     }} className="px-3 py-2  bg-red-500 ">
                         <Image src={WhiteKn} alt="White Knight" width={50} height={50} />
                     </button>
                     <button onClick={() => {
-                         setWhitePawn(false), changePawn("Queen"); 
+                         setWhitePawn(false); changePawn("Queen"); 
                     }} className="px-3 py-2  bg-red-500 ">
                         <Image src={WhiteQ} alt="White Queen" width={50} height={50} />
 
@@ -931,22 +931,22 @@ function ChessBoard() {
 
                 <Popup open={isBlackPawnAtEnd} closeOnDocumentClick={false} modal>
                     <button onClick={() => {
-                         setBlackPawn(false), changePawn("Rook"); 
+                         setBlackPawn(false); changePawn("Rook"); 
                     }} className="px-3 py-2  bg-red-500">
                         <Image src={BlackR} alt="Black Rook" width={50} height={50} />
                     </button>
                     <button onClick={() => {
-                         setBlackPawn(false), changePawn("Bishop"); 
+                         setBlackPawn(false); changePawn("Bishop"); 
                     }} className="px-3 py-2  bg-red-500 ">
                         <Image src={BlackB} alt="Black Bishop" width={50} height={50} />
                     </button>
                     <button onClick={() => {
-                         setBlackPawn(false), changePawn("Knight"); 
+                         setBlackPawn(false); changePawn("Knight"); 
                     }} className="px-3 py-2  bg-red-500 ">
                         <Image src={BlackKn} alt="Black Knight" width={50} height={50} />
                     </button>
                     <button onClick={() => {
-                         setBlackPawn(false), changePawn("Queen"); 
+                         setBlackPawn(false); changePawn("Queen"); 
                     }} className="px-3 py-2  bg-red-500 ">
                         <Image src={BlackQ} alt="Black Queen" width={50} height={50} />
 
