@@ -98,7 +98,7 @@ export const getValidMoves = (board: Board, square: Square): Square[] => {
     const pieceType = type.replace("White", "").replace("Black", ""); // Strip color
 
     // Convert letter (column) to index (0-7)
-    const colIndex = letterToIndex(square.col);
+    // const colIndex = letterToIndex(square.col);
 
     switch (pieceType) {
         case 'Pawn': return getPawnMoves(board, square, color);
