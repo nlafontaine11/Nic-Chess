@@ -209,7 +209,7 @@ function ChessBoard() {
             switchTurn();
         }
     };
-    const checkForJump = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any): boolean => {
+    const checkForJump = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string): boolean => {
         //checking if you can jump over other peice
         let flag = true;
         if (selectedRow < targetRow) { //up
@@ -253,7 +253,7 @@ function ChessBoard() {
         }
 
     }
-    const checkForJumpBishops = (targetRow: number, selectedRow: number, targetCol: String, selectedCol: String, selectedPiece: any, index: any): boolean => {
+    const checkForJumpBishops = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string): boolean => {
         let flag = true;
 
         if ((selectedRow + ((selectedCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)))) < targetRow + (targetCol.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0))) { //up right
@@ -404,7 +404,7 @@ function ChessBoard() {
         }
 
     }
-    const WhiteKnight = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
+    const WhiteKnight = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, index: any) => {
         if ((targetRow === selectedRow + 2 && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) || (targetRow === selectedRow + 2 && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) { // 2 rows up and 1 col left or right
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
                 {
@@ -446,7 +446,7 @@ function ChessBoard() {
             update(index);
         }
     }
-    const BlackKnight = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
+    const BlackKnight = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, index: any) => {
         if ((targetRow === selectedRow + 2 && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) - 1)) || (targetRow === selectedRow + 2 && targetCol === String.fromCharCode(selectedCol.charCodeAt(0) + 1))) { // 2 rows up and 1 col left or right
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("White")) {
                 {
@@ -547,7 +547,7 @@ function ChessBoard() {
             }
         }
     }
-    const BlackBishop = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
+    const BlackBishop = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, index: any) => {
         for (const { row: rowDir, col: colDir } of BishopDirections) {
             let currentRow = selectedRow;
             let currentCol = selectedCol;
@@ -569,7 +569,7 @@ function ChessBoard() {
             }
         }
     }
-    const WhiteKing = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
+    const WhiteKing = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, index: any) => {
 
         if (((targetRow === selectedRow + 1) && (targetCol === selectedCol)) || ((targetRow === selectedRow - 1) && targetCol === selectedCol)) {
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("Black")) {
@@ -619,7 +619,7 @@ function ChessBoard() {
         }
 
     }
-    const BlackKing = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, selectedPiece: any, index: any) => {
+    const BlackKing = (targetRow: number, selectedRow: number, targetCol: string, selectedCol: string, index: any) => {
         if (((targetRow === selectedRow + 1) && (targetCol === selectedCol)) || ((targetRow === selectedRow - 1) && targetCol === selectedCol)) {
             if (isBoard[index].piece && isBoard[index].piece?.type.includes("White")) {
                 {
